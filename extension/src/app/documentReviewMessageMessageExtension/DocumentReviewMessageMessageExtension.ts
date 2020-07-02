@@ -53,7 +53,7 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
                                     items: [
                                         {
                                             type: "Image",
-                                            url: "https://pbs.twimg.com/profile_images/881053627686805504/va_7V-qh_400x400.jpg",
+                                            url: `https://${process.env.HOSTNAME}/assets/icon.png`,
                                             style: "Person"
                                         }
                                     ]
@@ -84,7 +84,7 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
                                     ]
                                 }
                             ]
-                        }                        
+                        }                     
                     ],
                     actions: [
                         {
@@ -93,13 +93,38 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
                             url: doc.url
                         },
                         {
-                            type: "Action.Submit",
-                            title: "Reviewed",
-                            data: {
-                                action: "reviewed",
-                                id: doc.id
+                            type: "Action.ShowCard",
+                            title: "Review",
+                            card: {
+                                type: "AdaptiveCard",
+                                body: [
+                                    {
+                                        type: "Input.Text",
+                                        isVisible: false,
+                                        value: doc.id,
+                                        id: "id"
+                                    },
+                                    {
+                                        type: "Input.Text",
+                                        isVisible: false,
+                                        value: "reviewed",
+                                        id: "action"
+                                    },
+                                    {
+                                        type: "Input.Date",
+                                        id: "nextReview"
+                                    }
+                                ],
+                                actions: [
+                                    {
+                                        type: "Action.Submit",
+                                        title: "Reviewed"
+                                        
+                                    }
+                                ],
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
                             }
-                        }
+                        }                        
                     ],
                     $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
                     version: "1.0"
@@ -114,6 +139,7 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
                             url: `https://${process.env.HOSTNAME}/assets/icon.png`
                         }
                     ]
+                 
                 }
             };
             attachments.push({ contentType: card.contentType, content: card.content, preview: preview });
@@ -139,13 +165,26 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
     }
     
     public async onCardButtonClicked(context: TurnContext, value: any): Promise<void> {
+        const adapter: any = context.adapter;
+        const magicCode = (value.state && Number.isInteger(Number(value.state))) ? value.state : '';        
+        const tokenResponse = await adapter.getUserToken(context, this.connectionName, magicCode);
+
+        if (!tokenResponse || !tokenResponse.token) {
+            // There is no token, so the user has not signed in yet.
+            // Cannot occur as no sign in no Action Response before
+
+            return Promise.reject();
+        }
         // Handle the Action.Submit action on the adaptive card
         if (value.action === "reviewed") {
             const controller = new GraphController();
             const siteID: string = process.env.SITE_ID ? process.env.SITE_ID : '';
             const listID: string = process.env.LIST_ID ? process.env.LIST_ID : '';
-            controller.updateItem(siteID, listID, value.id, new Date().toString());
-        }
+            const today = new Date();
+            let nextReview = today.setDate(today.getDate() + 180);
+            
+            controller.updateItem(tokenResponse.token, siteID, listID, value.id, new Date(nextReview).toString());
+        }    
         return Promise.resolve();
     }
 
