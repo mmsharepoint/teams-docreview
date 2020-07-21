@@ -2,7 +2,7 @@
 
 Generate a Microsoft Teams application.
 
-TODO: Add your documentation here
+To get a detailed description of this solution read my little [Blog series](https://mmsharepoint.wordpress.com/2020/07/03/a-microsoft-teams-messaging-extension-with-authentication-and-access-to-microsoft-graph-i/) on this.
 
 ## Getting started with Microsoft Teams Apps development
 

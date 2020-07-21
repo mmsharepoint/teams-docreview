@@ -40,8 +40,8 @@
           "parameters": [
             {
               "name": "parameter",
-              "description": "Description of the parameter",
-              "title": "Parameter"
+              "description": "Filter documents",
+              "title": "Filter Parameter"
             }
           ],
           "type": "query"

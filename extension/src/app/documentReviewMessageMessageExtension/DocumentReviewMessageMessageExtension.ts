@@ -12,6 +12,7 @@ const log = debug("msteams");
 @PreventIframe("/documentReviewMessageMessageExtension/config.html")
 export default class DocumentReviewMessageMessageExtension implements IMessagingExtensionMiddlewareProcessor {
     private connectionName = process.env.ConnectionName;
+    private documents: IDocument[];
     public async onQuery(context: TurnContext, query: MessagingExtensionQuery): Promise<MessagingExtensionResult> {
         const attachments: MessagingExtensionAttachment[] = [];
         const adapter: any = context.adapter;
@@ -35,11 +36,30 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
             };
             return Promise.resolve(composeExtension);
         }
-        const controller = new GraphController();
-        const siteID: string = process.env.SITE_ID ? process.env.SITE_ID : '';
-        const listID: string = process.env.LIST_ID ? process.env.LIST_ID : '';
-        let documents: IDocument[] = await controller.getFiles(tokenResponse.token, siteID, listID);
+        let documents: IDocument[] = [];
+        if (query.parameters && query.parameters[0] && query.parameters[0].name === "initialRun") {
+            const controller = new GraphController();
+            const siteID: string = process.env.SITE_ID ? process.env.SITE_ID : '';
+            const listID: string = process.env.LIST_ID ? process.env.LIST_ID : '';
+            documents = await controller.getFiles(tokenResponse.token, siteID, listID);
+            this.documents = documents;
+        }
+        else {
+            if (query.parameters && query.parameters[0]) {
+                const srchStr = query.parameters[0].value;
+                documents = this.documents.filter(doc => 
+                    doc.name.indexOf(srchStr) > -1 ||
+                    doc.description.indexOf(srchStr) > -1 ||
+                    doc.author.indexOf(srchStr) > -1 ||
+                    doc.url.indexOf(srchStr) > -1 ||
+                    doc.modified.toLocaleString().indexOf(srchStr) > -1 
+                );
+            }            
+        }
         documents.forEach((doc) => {
+            const today = new Date();
+            const nextReview = new Date(today.setDate(today.getDate() + 180));
+            const minNextReview = new Date(today.setDate(today.getDate() + 30));
             const card = CardFactory.adaptiveCard(
                 {
                     type: "AdaptiveCard",
@@ -112,7 +132,10 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
                                     },
                                     {
                                         type: "Input.Date",
-                                        id: "nextReview"
+                                        id: "nextReview",
+                                        value: nextReview.toLocaleDateString(),
+                                        min: minNextReview.toLocaleDateString(),
+                                        spacing: "Medium"
                                     }
                                 ],
                                 actions: [
@@ -122,7 +145,8 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
                                         
                                     }
                                 ],
-                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                version: "1.0"
                             }
                         }                        
                     ],
@@ -145,23 +169,11 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
             attachments.push({ contentType: card.contentType, content: card.content, preview: preview });
         });
         
-
-        if (query.parameters && query.parameters[0] && query.parameters[0].name === "initialRun") {
-            // initial run
-
-            return Promise.resolve({
-                type: "result",
-                attachmentLayout: "list",
-                attachments: attachments
-            } as MessagingExtensionResult);
-        } else {
-            // the rest
-            return Promise.resolve({
-                type: "result",
-                attachmentLayout: "list",
-                attachments: attachments
-            } as MessagingExtensionResult);
-        }
+        return Promise.resolve({
+            type: "result",
+            attachmentLayout: "list",
+            attachments: attachments
+        } as MessagingExtensionResult);        
     }
     
     public async onCardButtonClicked(context: TurnContext, value: any): Promise<void> {
@@ -170,9 +182,7 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
         const tokenResponse = await adapter.getUserToken(context, this.connectionName, magicCode);
 
         if (!tokenResponse || !tokenResponse.token) {
-            // There is no token, so the user has not signed in yet.
-            // Cannot occur as no sign in no Action Response before
-
+            // There is no token, so the user has not signed in yet.            
             return Promise.reject();
         }
         // Handle the Action.Submit action on the adaptive card
@@ -180,10 +190,19 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
             const controller = new GraphController();
             const siteID: string = process.env.SITE_ID ? process.env.SITE_ID : '';
             const listID: string = process.env.LIST_ID ? process.env.LIST_ID : '';
-            const today = new Date();
-            let nextReview = today.setDate(today.getDate() + 180);
-            
-            controller.updateItem(tokenResponse.token, siteID, listID, value.id, new Date(nextReview).toString());
+            let nextReview: Date;
+            if (value.nextReview === null || value.nextReview === '') {
+                const today = new Date();
+                nextReview = new Date(today.setDate(today.getDate() + 180));
+            }
+            else {
+                nextReview = new Date(value.nextReview);
+            }
+            controller.updateItem(tokenResponse.token, siteID, listID, value.id, nextReview.toString());
+            // For testing purposes sign out again
+            // .then(() => {
+            //     adapter.signOutUser(context, this.connectionName);
+            // });
         }    
         return Promise.resolve();
     }
