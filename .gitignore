@@ -16,3 +16,4 @@ connectors.json
 
 # do not include dist files
 dist
+extension/settings.json

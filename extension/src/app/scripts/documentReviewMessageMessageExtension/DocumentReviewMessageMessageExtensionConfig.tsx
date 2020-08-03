@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Provider, Flex, Header, Checkbox, Button } from "@fluentui/react-northstar";
+import { Provider, Flex, Header, Input, Checkbox, Button, Label } from "@fluentui/react-northstar";
 import TeamsBaseComponent, { ITeamsBaseComponentState } from "msteams-react-base-component";
 import * as microsoftTeams from "@microsoft/teams-js";
 
@@ -7,7 +7,8 @@ import * as microsoftTeams from "@microsoft/teams-js";
  * State for the DocumentReviewMessageMessageExtensionConfig React component
  */
 export interface IDocumentReviewMessageMessageExtensionConfigState extends ITeamsBaseComponentState {
-    onOrOff: boolean;
+    siteID: string;
+    listID: string;
 }
 
 /**
@@ -22,12 +23,16 @@ export interface IDocumentReviewMessageMessageExtensionConfigProps {
  */
 export class DocumentReviewMessageMessageExtensionConfig extends TeamsBaseComponent<IDocumentReviewMessageMessageExtensionConfigProps, IDocumentReviewMessageMessageExtensionConfigState> {
 
-    public acomponentWillMount() {
+    public componentWillMount() {
         this.updateTheme(this.getQueryVariable("theme"));
-        this.setState({
-            onOrOff: true
-        });
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const siteID = urlParams.get('siteID');
+        const listID = urlParams.get('listID');
+        this.setState({
+            siteID: siteID ? siteID : "",
+            listID: listID ? listID : ""
+        });
         microsoftTeams.initialize();
         microsoftTeams.registerOnThemeChangeHandler(this.updateTheme);
         microsoftTeams.appInitialization.notifySuccess();
@@ -43,14 +48,38 @@ export class DocumentReviewMessageMessageExtensionConfig extends TeamsBaseCompon
                     <Flex.Item>
                         <div>
                             <Header content="Document Review Message configuration" />
-                            <Checkbox
-                                label="On or off?"
-                                toggle
-                                checked={this.state.onOrOff}
-                                onChange={() => { this.setState({ onOrOff: !this.state.onOrOff }); }} />
+                            <Label>Site ID: </Label>
+                            <Input
+                                placeholder="Enter a site ID here"
+                                fluid
+                                clearable
+                                value={this.state.siteID}
+                                onChange={(e, data) => {
+                                    if (data) {
+                                        this.setState({
+                                            siteID: data.value
+                                        });
+                                    }
+                                }}
+                                required />
+                            <Label>List ID: </Label>
+                            <Input
+                                placeholder="Enter a list ID here"
+                                fluid
+                                clearable
+                                value={this.state.listID}
+                                onChange={(e, data) => {
+                                    if (data) {
+                                        this.setState({
+                                            listID: data.value
+                                        });
+                                    }
+                                }}
+                                required />
                             <Button onClick={() =>
                                 microsoftTeams.authentication.notifySuccess(JSON.stringify({
-                                    setting: this.state.onOrOff
+                                    siteID: this.state.siteID,
+                                    listID: this.state.listID
                                 }))} primary>OK</Button>
                         </div>
                     </Flex.Item>

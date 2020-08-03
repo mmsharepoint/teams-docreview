@@ -3,6 +3,7 @@ import { PreventIframe } from "express-msteams-host";
 import { TurnContext, CardFactory, MessagingExtensionQuery, MessagingExtensionResult, MessagingExtensionAction, ActionTypes, MessagingExtensionAttachment } from "botbuilder";
 // import { MessagingExtensionQuery, MessagingExtensionResult } from "botbuilder-teams";
 import { IMessagingExtensionMiddlewareProcessor } from "botbuilder-teams-messagingextensions";
+import { JsonDB } from 'node-json-db';
 import { IDocument } from "../../model/IDocument";
 import GraphController from "../../controller/GraphController";
 
@@ -18,7 +19,6 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
         const adapter: any = context.adapter;
         const magicCode = (query.state && Number.isInteger(Number(query.state))) ? query.state : '';        
         const tokenResponse = await adapter.getUserToken(context, this.connectionName, magicCode);
-
         if (!tokenResponse || !tokenResponse.token) {
             // There is no token, so the user has not signed in yet.
 
@@ -37,10 +37,20 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
             return Promise.resolve(composeExtension);
         }
         let documents: IDocument[] = [];
+        
         if (query.parameters && query.parameters[0] && query.parameters[0].name === "initialRun") {
             const controller = new GraphController();
-            const siteID: string = process.env.SITE_ID ? process.env.SITE_ID : '';
-            const listID: string = process.env.LIST_ID ? process.env.LIST_ID : '';
+            const configFilename = process.env.CONFIG_FILENAME;
+            const settings = new JsonDB(configFilename ? configFilename : "settings", true, false);
+            let siteID: string;
+            let listID: string;
+            try {
+                siteID = settings.getData(`/${context.activity.channelData.tenant.id}/${context.activity.channelData.team.id}/${context.activity.channelData.channel.id}/siteID`);
+                listID = settings.getData(`/${context.activity.channelData.tenant.id}/${context.activity.channelData.team.id}/${context.activity.channelData.channel.id}/listID`);
+            } catch (err) {
+                siteID = process.env.SITE_ID ? process.env.SITE_ID : '';
+                listID = process.env.LIST_ID ? process.env.LIST_ID : '';
+            }            
             documents = await controller.getFiles(tokenResponse.token, siteID, listID);
             this.documents = documents;
         }
@@ -198,27 +208,43 @@ export default class DocumentReviewMessageMessageExtension implements IMessaging
             else {
                 nextReview = new Date(value.nextReview);
             }
-            controller.updateItem(tokenResponse.token, siteID, listID, value.id, nextReview.toString());
+            controller.updateItem(tokenResponse.token, siteID, listID, value.id, nextReview.toString())
             // For testing purposes sign out again
-            // .then(() => {
-            //     adapter.signOutUser(context, this.connectionName);
-            // });
+            .then(() => {
+                adapter.signOutUser(context, this.connectionName);
+            });
         }    
         return Promise.resolve();
     }
 
     // this is used when canUpdateConfiguration is set to true
     public async onQuerySettingsUrl(context: TurnContext): Promise<{ title: string, value: string }> {
+        const configFilename = process.env.CONFIG_FILENAME;
+        const settings = new JsonDB(configFilename ? configFilename : "settings", true, false);
+        let siteID: string;
+        let listID: string;
+        try {
+            siteID = settings.getData(`/${context.activity.channelData.tenant.id}/${context.activity.channelData.team.id}/${context.activity.channelData.channel.id}/siteID`);
+            listID = settings.getData(`/${context.activity.channelData.tenant.id}/${context.activity.channelData.team.id}/${context.activity.channelData.channel.id}/listID`);
+        } 
+        catch (err) 
+        {
+            siteID = process.env.SITE_ID ? process.env.SITE_ID : '';
+            listID = process.env.LIST_ID ? process.env.LIST_ID : '';
+        }   
         return Promise.resolve({
             title: "Document Review Message Configuration",
-            value: `https://${process.env.HOSTNAME}/documentReviewMessageMessageExtension/config.html`
+            value: `https://${process.env.HOSTNAME}/documentReviewMessageMessageExtension/config.html?siteID=${siteID}&listID=${listID}`
         });
     }
 
     public async onSettings(context: TurnContext): Promise<void> {
         // take care of the setting returned from the dialog, with the value stored in state
-        const setting = context.activity.value.state;
+        const setting = JSON.parse(context.activity.value.state);
         log(`New setting: ${setting}`);
+        const configFilename = process.env.CONFIG_FILENAME;
+        const settings = new JsonDB(configFilename ? configFilename : "settings", true, false);
+        settings.push(`/${context.activity.channelData.tenant.id}/${context.activity.channelData.team.id}/${context.activity.channelData.channel.id}`, setting, false);
         return Promise.resolve();
     }
 
