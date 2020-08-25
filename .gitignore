@@ -17,5 +17,7 @@ connectors.json
 # do not include dist files
 dist
 
-*settings.json
+# do not inlude local settings
+msgext-action-docreview/settings.json
+extension/settings.json
 
