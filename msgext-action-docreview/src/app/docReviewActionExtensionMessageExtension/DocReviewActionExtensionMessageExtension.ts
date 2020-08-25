@@ -101,6 +101,13 @@ export default class DocReviewActionExtensionMessageExtension implements IMessag
             ]
           }
         ],
+        actions: [
+          {
+              type: "Action.OpenUrl",
+              title: "View",
+              url: value.data.doc.url
+          }
+        ],
         $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
         version: "1.0"
       });

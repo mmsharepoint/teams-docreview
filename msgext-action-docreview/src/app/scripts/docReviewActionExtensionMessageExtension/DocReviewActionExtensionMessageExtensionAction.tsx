@@ -103,7 +103,7 @@ export class DocReviewActionExtensionMessageExtensionAction extends TeamsBaseCom
       Axios.get(`https://${process.env.HOSTNAME}/api/files`, {
                       responseType: "json",
                       headers: {
-                          Authorization: `Bearer ${this.state.ssoToken}`
+                        Authorization: `Bearer ${this.state.ssoToken}`
                       }
           }).then(result => {
             let docs: IDocument[] = [];
@@ -111,11 +111,11 @@ export class DocReviewActionExtensionMessageExtensionAction extends TeamsBaseCom
               docs.push({ name: d.name, id: d.id, description: d.description, author: d.author, nextReview: new Date(d.nextReview), modified: new Date(d.modified), url: d.url });
             });
             this.setState({
-                documents: docs
+              documents: docs
             });
           })
           .catch((error) => {
-              console.log(error);
+            console.log(error);
           });
     }
   }
@@ -124,7 +124,7 @@ export class DocReviewActionExtensionMessageExtensionAction extends TeamsBaseCom
   private listItemSelected = (e, newProps) => {
     const selectedDoc = this.state.documents.filter(doc => doc.id === newProps.items[newProps.selectedIndex].key)[0];
     microsoftTeams.tasks.submitTask({
-        doc: selectedDoc
+      doc: selectedDoc
     });
     this.setState({
       selectedListItem: newProps.selectedIndex
