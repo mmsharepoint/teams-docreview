@@ -20,4 +20,4 @@ dist
 # do not inlude local settings
 msgext-action-docreview/settings.json
 extension/settings.json
-
+settings.json
