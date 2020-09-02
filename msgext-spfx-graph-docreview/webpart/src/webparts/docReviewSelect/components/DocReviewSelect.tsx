@@ -11,9 +11,9 @@ const DocReviewSelect: React.FunctionComponent<IDocReviewSelectProps> = (props) 
   const [documents, setDocuments] = useState([] as IDocument[]);
   const columns = [
     { key: 'columnPre', name: '', fieldName: 'urgent', minWidth: 12, maxWidth: 12, isResizable: false },
-    { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 60, maxWidth: 150, isResizable: true },
-    { key: 'column2', name: 'Description', fieldName: 'description', minWidth: 100, maxWidth: 150, isResizable: true },
-    { key: 'column3', name: 'Created by', fieldName: 'author', minWidth: 100, maxWidth: 200, isResizable: true },
+    { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 60, maxWidth: 120, isResizable: true },
+    { key: 'column2', name: 'Description', fieldName: 'description', minWidth: 150, maxWidth: 150, isResizable: true },
+    { key: 'column3', name: 'Created by', fieldName: 'author', minWidth: 60, maxWidth: 120, isResizable: true },
     { key: 'column4', name: 'Next Review', fieldName: 'nextReview', minWidth: 50, maxWidth: 100, isResizable: true },
     { key: 'column5', name: 'Url', fieldName: 'url', minWidth: 100, maxWidth: 200, isResizable: true }
   ];

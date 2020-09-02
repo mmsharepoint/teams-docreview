@@ -8,12 +8,18 @@
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "developer": {
-      "name": "",
-      "websiteUrl": "",
+      "name": "Markus Moeller",
+      "websiteUrl": "https://mmsharepoint.wordpress.com",
       "privacyUrl": "",
       "termsOfUseUrl": "",
       "mpnId": ""
-    }
+    },
+    "webApiPermissionRequests": [
+      {
+        "resource": "Microsoft Graph",
+        "scope": "Sites.ReadWrite.All"
+      }
+    ]
   },
   "paths": {
     "zippedPackage": "solution/msgext-spfx-graph-docreview.sppkg"

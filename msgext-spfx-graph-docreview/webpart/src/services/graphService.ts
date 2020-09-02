@@ -43,12 +43,12 @@ export default class GraphService {
 	public async setDocumentReviewed(itemID: string, fieldValueSet) {		
     const config: IConfig = await this.spService.getConfig();
 		return this.client.api(`https://graph.microsoft.com/v1.0/sites/${config.siteID}/lists/${config.listID}/items/${itemID}/fields`)
-          .patch(fieldValueSet)
-          .then((response) => {
-            return response;
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+      .patch(fieldValueSet)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 	}
 }

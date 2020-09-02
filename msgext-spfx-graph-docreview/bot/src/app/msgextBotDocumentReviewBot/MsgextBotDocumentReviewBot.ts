@@ -41,16 +41,15 @@ export class MsgextBotDocumentReviewBot extends TeamsActivityHandler {
     console.log(value);
     const componentID = '75f1c63b-e3d1-46b2-957f-3d19a622c463';
     const itemID = value.data.item.key;
-    const teamSiteDomain = 'mmoeller.sharepoint.com'; // ToDo: Make configurable
     return Promise.resolve({
       task: {
         type: "continue",
         value: {
           title: "Mark document as reviewed",
-          height: 500,
-          width: "medium",
-          url: `https://${teamSiteDomain}/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/_layouts/15/teamstaskhostedapp.aspx%3Fteams%26personal%26componentId=${componentID}%26forceLocale={locale}%26itemID=${itemID}`,
-          fallbackUrl: `https://${teamSiteDomain}/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/_layouts/15/teamstaskhostedapp.aspx%3Fteams%26personal%26componentId=${componentID}%26forceLocale={locale}`
+          height: 300,
+          width: 400,
+          url: `https://{teamSiteDomain}/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/_layouts/15/teamstaskhostedapp.aspx%3Fteams%26personal%26componentId=${componentID}%26forceLocale={locale}%26itemID=${itemID}`,
+          fallbackUrl: `https://{teamSiteDomain}/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/_layouts/15/teamstaskhostedapp.aspx%3Fteams%26personal%26componentId=${componentID}%26forceLocale={locale}`
         }
       }
     });
@@ -62,16 +61,17 @@ export class MsgextBotDocumentReviewBot extends TeamsActivityHandler {
    * @param action 
    */
   protected async handleTeamsMessagingExtensionSubmitAction(context: TurnContext, action: MessagingExtensionAction): Promise<any> {
-    const revAction: CardAction =  { title: 'Reviewed (Hero)', type: 'invoke', value: { type: 'task/fetch', item: action.data } };
-    const revImage: CardImage = { url: `https://${process.env.HOSTNAME}/assets/icon.png` };
-    const heroCard = CardFactory.heroCard(action.data.name, action.data.description, [revImage], [revAction]);
-    heroCard.content.subtitle = action.data.author;
+    const viewAction: CardAction = { title: 'View', type: 'openUrl', value: action.data.url };
+    const revAction: CardAction =  { title: 'Reviewed', type: 'invoke', value: { type: 'task/fetch', item: action.data } };
+    const revImage: CardImage = { url: `https://${process.env.HOSTNAME}/assets/icon.png` };   
     
+    const thumbCard = CardFactory.thumbnailCard(action.data.name, action.data.description, [revImage], [viewAction, revAction]);
+    thumbCard.content.subtitle = action.data.author;
     const response: MessagingExtensionActionResponse = {
       composeExtension: {
         type: 'result',
         attachmentLayout: 'grid',
-        attachments:  [ heroCard ]
+        attachments:  [ thumbCard ]
       }
     }
     return Promise.resolve(response);

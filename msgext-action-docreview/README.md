@@ -109,6 +109,36 @@ To debug the code you can append the argument `debug` to the `serve` command as 
 ``` bash
 gulp serve --debug
 ```
+To step through code in Visual Studio Code you need to add the following snippet in the `./.vscode/launch.json` file. Once done, you can easily attach to the node process after running the `gulp server --debug` command.
+
+``` json
+{
+    "type": "node",
+    "request": "attach",
+    "name": "Attach",
+    "port": 5858,
+    "sourceMaps": true,
+    "outFiles": [
+        "${workspaceRoot}/dist/**/*.js"
+    ],
+    "remoteRoot": "${workspaceRoot}/src/"
+},
+```
+
+### Using ngrok for local development and hosting
+
+In order to make development locally a great experience it is recommended to use [ngrok](https://ngrok.io), which allows you to publish the localhost on a public DNS, so that you can consume the bot and the other resources in Microsoft Teams. 
+
+To use ngrok, it is recommended to use the `gulp ngrok-serve` command, which will read your ngrok settings from the `.env` file and automatically create a correct manifest file and finally start a local development server using the ngrok settings.
+
+For an even better expereince you can
+- Fire up **two** command prompts
+- Both switch to local directory of your solution
+- In one call gulp start-ngrok
+- In the other only run gulp serve --debug
+  - This one you can now start and stop as often as you want without losing your temp. Url
+- [Further details on this](https://mmsharepoint.wordpress.com/2020/06/27/microsoft-teams-app-yeoman-generator-split-ngrok-serve/)
+
 ### Additional build options
 
 You can use the following flags for the `serve`, `ngrok-serve` and build commands:
