@@ -5,8 +5,8 @@
   "id": "{componentID}",
   "version": "0.1",
   "developer": {
-    "name": "Markus Moeller",
-    "websiteUrl": "https://mmsharepoint.wordpress.com",
+    "name": "PnP Developer",
+    "websiteUrl": "https://{your-company-url}",
     "privacyUrl": "https://{your-company-url}/privacystatement",
     "termsOfUseUrl": "https://{your-company-url}/servicesagreement"
   },
@@ -39,9 +39,9 @@
       "canUpdateConfiguration": true,
       "commands": [
         {
-          "id": "docReview",
+          "id": "{Extension id}",
           "type": "action",
-          "title": "Doc Review Action Extension",
+          "title": "{Extension name}",
           "description": "{Extension description}",
           "initialRun": false,
           "fetchTask": false,
@@ -50,7 +50,7 @@
             "compose"
           ],
           "taskInfo": {
-            "title": "Documents to review",
+            "title": "{Task module title}",
             "width": "1100",
             "height": "665",
             "url": "https://{teamSiteDomain}/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/_layouts/15/teamstaskhostedapp.aspx%3Fteams%26personal%26componentId={componentID}%26forceLocale={locale}"
