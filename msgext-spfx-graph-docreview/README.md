@@ -15,7 +15,7 @@ It uses the new SPFx capability to be [exposed as a Messaging extension](https:/
 
 ![Task module for Review](https://mmsharepoint.files.wordpress.com/2020/09/07messagingextensionreviewedtaskmodule.png)
 
-This example is fully documented in the author's [blog post](https://mmsharepoint.wordpress.com/tag/microsoft-teams-development/)
+This example is fully documented in the author's [blog post](https://mmsharepoint.wordpress.com/2020/09/03/use-spfx-for-task-modules-in-teams-messaging-extensions-and-access-microsoft-graph/)
 
 ## Used SharePoint Framework Version
 
@@ -79,14 +79,13 @@ To step through code of the **bot** in Visual Studio Code you need to add the fo
 ``` json
 {
     "type": "node",
-    "request": "attach",
-    "name": "Attach",
-    "port": 5858,
-    "sourceMaps": true,
-    "outFiles": [
-        "${workspaceRoot}/dist/**/*.js"
-    ],
-    "remoteRoot": "${workspaceRoot}/src/"
+      "request": "attach",
+      "name": "Attach Node",
+      "port": 9229,
+      "sourceMaps": true,
+      "outFiles": [
+          "${workspaceRoot}/dist/**/*.js"
+      ]
 },
 ```
 To step through the code of the **webpart** it is best to open the task module (Select or Reviewed) while having gulp serve running and installed a .sppkg file created without --ship and locate the files via browser's developer tools. [See here for instance](https://www.eliostruyf.com/how-to-debug-your-sharepoint-framework-web-part/)
@@ -97,6 +96,7 @@ This extension illustrates the following concepts:
 
 - [Expose an SPFx webpart as Teams Messaging extension]()
 - [Add and respond to card actions](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions)
+- Hand over parameters to task modules
 
 ## References
 
