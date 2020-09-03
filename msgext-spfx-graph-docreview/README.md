@@ -26,11 +26,6 @@ This example is fully documented in the author's [blog post](https://mmsharepoin
 - [SharePoint Framework](https://aka.ms/spfx)
 - [Microsoft 365 tenant](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-developer-tenant)
 
-
-## Prerequisites
-
-> Any special pre-requisites?
-
 ## Version history
 
 Version|Date|Author|Comments
