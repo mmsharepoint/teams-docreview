@@ -7,9 +7,9 @@ It uses the new SPFx capability to be [exposed as a Messaging extension](https:/
 
 ![Result: Documents for review](https://mmsharepoint.files.wordpress.com/2020/09/05messagingextensionselecttaskmodule.png)
 
-... and a bot-framework thumbnail card with document details is inserted into the conversation...
+... and an AdaptiveCard with document details is inserted into the conversation...
 
-![Document Thumbnail Card](https://mmsharepoint.files.wordpress.com/2020/09/06messagingextensiondocthumbnailcard.png)
+![Document Thumbnail Card](https://mmsharepoint.files.wordpress.com/2020/09/06messagingextensiondocadaptivecard.png?w=666)
 
 ...finally another task module to mark the document as "Reviewed"
 
