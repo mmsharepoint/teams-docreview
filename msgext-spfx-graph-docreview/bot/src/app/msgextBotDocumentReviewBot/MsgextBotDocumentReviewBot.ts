@@ -61,17 +61,78 @@ export class MsgextBotDocumentReviewBot extends TeamsActivityHandler {
    * @param action 
    */
   protected async handleTeamsMessagingExtensionSubmitAction(context: TurnContext, action: MessagingExtensionAction): Promise<any> {
-    const viewAction: CardAction = { title: 'View', type: 'openUrl', value: action.data.url };
-    const revAction: CardAction =  { title: 'Reviewed', type: 'invoke', value: { type: 'task/fetch', item: action.data } };
-    const revImage: CardImage = { url: `https://${process.env.HOSTNAME}/assets/icon.png` };   
-    
-    const thumbCard = CardFactory.thumbnailCard(action.data.name, action.data.description, [revImage], [viewAction, revAction]);
-    thumbCard.content.subtitle = action.data.author;
+    const docCard = CardFactory.adaptiveCard(
+      {
+        type: "AdaptiveCard",
+        body: [
+          {
+            type: "ColumnSet",
+            columns: [
+                {
+                  type: "Column",
+                  width: 25,
+                  items: [
+                    {
+                      type: "Image",
+                      url: `https://${process.env.HOSTNAME}/assets/icon.png`,
+                      style: "Person"
+                    }
+                  ]
+                },
+                {
+                  type: "Column",
+                  width: 75,
+                  items: [
+                    {
+                      type: "TextBlock",
+                      text: action.data.name,
+                      size: "Large",
+                      weight: "Bolder"
+                    },
+                    {
+                      type: "TextBlock",
+                      text: action.data.description,
+                      size: "Medium"
+                    },
+                    {
+                      type: "TextBlock",
+                      text: `Author: ${action.data.author}`
+                    },
+                    {
+                      type: "TextBlock",
+                      text: `Modified: ${action.data.modified}`
+                    }
+                  ]
+                }
+            ]
+          }
+        ],
+        actions: [
+          {
+              type: "Action.OpenUrl",
+              title: "View",
+              url: action.data.url
+          },          
+          {
+            type: "Action.Submit",
+            title: "Reviewed",
+            data: {
+              item: action.data,
+              msteams: {
+                type: "task/fetch"
+              }  
+            } 
+                 
+          }
+        ],
+        $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+        version: "1.0"
+      });
     const response: MessagingExtensionActionResponse = {
       composeExtension: {
         type: 'result',
-        attachmentLayout: 'grid',
-        attachments:  [ thumbCard ]
+        attachmentLayout: 'list',
+        attachments:  [ docCard ]
       }
     }
     return Promise.resolve(response);
