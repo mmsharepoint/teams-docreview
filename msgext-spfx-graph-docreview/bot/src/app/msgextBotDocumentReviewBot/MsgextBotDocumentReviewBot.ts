@@ -61,6 +61,7 @@ export class MsgextBotDocumentReviewBot extends TeamsActivityHandler {
    * @param action 
    */
   protected async handleTeamsMessagingExtensionSubmitAction(context: TurnContext, action: MessagingExtensionAction): Promise<any> {
+    const modifiedDate = new Date(action.data.modified);
     const docCard = CardFactory.adaptiveCard(
       {
         type: "AdaptiveCard",
@@ -100,7 +101,7 @@ export class MsgextBotDocumentReviewBot extends TeamsActivityHandler {
                     },
                     {
                       type: "TextBlock",
-                      text: `Modified: ${action.data.modified}`
+                      text: `Modified: ${modifiedDate.toLocaleDateString()}`
                     }
                   ]
                 }

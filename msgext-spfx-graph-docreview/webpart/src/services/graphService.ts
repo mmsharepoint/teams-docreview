@@ -40,7 +40,7 @@ export default class GraphService {
 					});
 	}
 	
-	public async setDocumentReviewed(itemID: string, fieldValueSet) {		
+	public async setDocumentReviewed(itemID: string, fieldValueSet): Promise<object> {		
     const config: IConfig = await this.spService.getConfig();
 		return this.client.api(`https://graph.microsoft.com/v1.0/sites/${config.siteID}/lists/${config.listID}/items/${itemID}/fields`)
       .patch(fieldValueSet)
@@ -49,6 +49,7 @@ export default class GraphService {
       })
       .catch((error) => {
         console.error(error);
+        return null;
       });
 	}
 }
