@@ -37,8 +37,6 @@ export class MsgextBotDocumentReviewBot extends TeamsActivityHandler {
    * @param value 
    */
   protected handleTeamsTaskModuleFetch(context: TurnContext, value: any): Promise<any> {
-    console.log(context);
-    console.log(value);
     const componentID = '75f1c63b-e3d1-46b2-957f-3d19a622c463';
     const itemID = value.data.item.key;
     return Promise.resolve({

@@ -26,8 +26,7 @@ const DocReviewMarkReviewed:React.FunctionComponent<IDocReviewMarkReviewedProps>
       .then(() => {
         graphService.setDocumentReviewed(props.itemID, fieldValueSet)
           .then((responseDoc) => {
-            console.log(responseDoc);
-            props.teamsContext.teamsJs.tasks.submitTask();
+            props.teamsContext.teamsJs.tasks.submitTask(); // Without parameter it just closes the task module (and won't reach the bot again)
           });
       });    
   };
